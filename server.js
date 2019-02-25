@@ -4,10 +4,11 @@ const helmet = require("helmet");
 const logger = require("morgan");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const db = require("./data/dbConfig");
 const User = require("./data/user-model");
 const server = express();
-
+const keys = "secret";
 server.use(express.json());
 server.use(helmet());
 server.use(cors());
@@ -39,10 +40,22 @@ server.post("/api/login", async (req, res) => {
 
   try {
     const user = await User.findBy({ username });
-    if (user && bcrypt.compareSync(password, user.password)) {
-      res.status(200).json({ message: `Welcome ${user.username}!` });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (isMatch) {
+      const payload = {
+        id: user.id,
+        username: user.username,
+        password: user.password
+      };
+
+      jwt.sign(payload, keys, { expiresIn: 604800000 }, (err, token) => {
+        res.json({
+          success: true,
+          token: token
+        });
+      });
     } else {
-      res.status(401).json({ message: "Invalid Credentials" });
+      res.status(400).json({ message: "password incorrect" });
     }
   } catch (err) {
     res.status(500).json({ message: `internal err server ${err}` });
@@ -51,22 +64,20 @@ server.post("/api/login", async (req, res) => {
 // @route    -MIDDLEWARE-
 // @desc      protected auth
 // @Access   Private
-async function auth(req, res, next) {
-  const { username, password } = req.headers;
-  try {
-    if (username && password) {
-      const user = await User.findBy({ username });
+function auth(req, res, next) {
+  const token = req.get("Authorization");
 
-      if (user && bcrypt.compareSync(password, user.password)) {
-        next();
+  if (token) {
+    jwt.verify(token, "secret", (error, decoded) => {
+      if (error) {
+        res.status(401).json({ message: "You are not authorized" });
       } else {
-        res.status(401).json({ message: "Invalid Credentials" });
+        req.decoded = decoded;
+        next();
       }
-    } else {
-      res.status(400).json({ message: "No credentials provided" });
-    }
-  } catch (err) {
-    res.status(500).json({ message: `internal err server ${err}` });
+    });
+  } else {
+    res.status(401).json({ message: "You are not authorized" });
   }
 }
 
