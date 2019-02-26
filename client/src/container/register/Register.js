@@ -2,57 +2,104 @@ import React from "react";
 import {
   Form,
   FormGroup,
-  Label,
   Input,
   FormFeedback,
-  FormText
+  Card,
+  Button,
+  CardTitle,
+  Row,
+  Col
 } from "reactstrap";
+import { connect } from "react-redux";
+import { registerUser } from "../../store/action/authAction";
+import { withRouter, Link } from "react-router-dom";
 
-export default class Register extends React.Component {
+class Register extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: "",
+      password: ""
+    };
+  }
+
+  handleChange = e => {
+    this.setState({
+      [e.target.name]: e.target.value
+    });
+  };
+
+  handleSubmit = e => {
+    e.preventDefault();
+    const { username, password } = this.state;
+    const { history } = this.props;
+    const newUser = {
+      username,
+      password
+    };
+    this.props.registerUser(newUser, history);
+  };
+
   render() {
+    console.log(this.props.errors);
+
     return (
-      <Form>
-        <FormGroup>
-          <Label for="exampleEmail">Input without validation</Label>
-          <Input />
-          <FormFeedback>You will not be able to see this</FormFeedback>
-          <FormText>Example help text that remains unchanged.</FormText>
-        </FormGroup>
-        <FormGroup>
-          <Label for="exampleEmail">Valid input</Label>
-          <Input valid />
-          <FormFeedback valid>Sweet! that name is available</FormFeedback>
-          <FormText>Example help text that remains unchanged.</FormText>
-        </FormGroup>
-        <FormGroup>
-          <Label for="examplePassword">Invalid input</Label>
-          <Input invalid />
-          <FormFeedback>Oh noes! that name is already taken</FormFeedback>
-          <FormText>Example help text that remains unchanged.</FormText>
-        </FormGroup>
-        <FormGroup>
-          <Label for="exampleEmail">Input without validation</Label>
-          <Input />
-          <FormFeedback tooltip>You will not be able to see this</FormFeedback>
-          <FormText>Example help text that remains unchanged.</FormText>
-        </FormGroup>
-        <FormGroup>
-          <Label for="exampleEmail">Valid input</Label>
-          <Input valid />
-          <FormFeedback valid tooltip>
-            Sweet! that name is available
-          </FormFeedback>
-          <FormText>Example help text that remains unchanged.</FormText>
-        </FormGroup>
-        <FormGroup>
-          <Label for="examplePassword">Invalid input</Label>
-          <Input invalid />
-          <FormFeedback tooltip>
-            Oh noes! that name is already taken
-          </FormFeedback>
-          <FormText>Example help text that remains unchanged.</FormText>
-        </FormGroup>
-      </Form>
+      <Row>
+        <Col sm="6" md="5" style={{ margin: "10vh auto" }}>
+          <Card body>
+            <CardTitle>REGISTER</CardTitle>
+            <Form onSubmit={this.handleSubmit}>
+              <FormGroup>
+                <Input
+                  type="text"
+                  placeholder="username"
+                  onChange={this.handleChange}
+                  name="username"
+                  value={this.state.username}
+                  invalid={this.props.errors.username && true}
+                />
+                {this.props.errors && (
+                  <FormFeedback>{this.props.errors.username}</FormFeedback>
+                )}
+              </FormGroup>
+              <FormGroup>
+                <Input
+                  type="password"
+                  placeholder="password"
+                  onChange={this.handleChange}
+                  name="password"
+                  value={this.state.password}
+                  invalid={
+                    (this.props.errors.password && true) ||
+                    (this.props.errors.message && true)
+                  }
+                />
+                {this.props.errors && (
+                  <FormFeedback>{this.props.errors.password}</FormFeedback>
+                )}
+                {this.props.errors && (
+                  <FormFeedback>{this.props.errors.message}</FormFeedback>
+                )}
+              </FormGroup>
+              <Link to="/login">Already have an account ?</Link> <br />
+              <Button color="primary" type="submit">
+                Submit
+              </Button>
+            </Form>
+          </Card>
+        </Col>
+      </Row>
     );
   }
 }
+const mapStateToProps = state => ({
+  loading: state.authReducer.loading,
+  isAuthenticated: state.authReducer.isAuthenticated,
+  errors: state.authReducer.errors,
+  user: state.authReducer.user
+});
+
+export default connect(
+  mapStateToProps,
+  { registerUser }
+)(withRouter(Register));

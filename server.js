@@ -19,8 +19,11 @@ server.use(logger("dev"));
 // @Access   Public
 server.post("/api/register", async (req, res) => {
   let user = req.body;
-  if (!user.username || !user.password) {
-    return res.status(400).json({ message: "all fields are required" });
+  if (!user.username) {
+    return res.status(400).json({ username: "Username field is required" });
+  }
+  if (!user.password) {
+    return res.status(400).json({ password: "Password field is required" });
   }
   try {
     const hash = bcrypt.hashSync(user.password, 10);
