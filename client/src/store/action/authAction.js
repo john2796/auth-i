@@ -5,8 +5,10 @@ import jwt_decode from "jwt-decode";
 export const GET_ERRORS = "GET_ERRORS";
 export const SET_CURRENT_USER = "SET_CURRENT_USER";
 export const LOADING = "LOADING";
+export const GET_USER = "GET_USER";
 
 const URL = `http://localhost:5000/api`;
+const USERS = `http://localhost:5000/api/users`;
 export const registerUser = (userData, history) => dispatch => {
   dispatch(setUserLoading());
   axios
@@ -20,7 +22,6 @@ export const registerUser = (userData, history) => dispatch => {
       });
     });
 };
-
 export const loginUser = userData => dispatch => {
   dispatch(setUserLoading());
   axios
@@ -34,6 +35,23 @@ export const loginUser = userData => dispatch => {
       setAuthToken(token);
       dispatch(setCurrentUser(decoded));
     })
+    .catch(err => {
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data || err
+      });
+    });
+};
+export const getAllUser = () => dispatch => {
+  dispatch(setUserLoading());
+  axios
+    .get(`${USERS}`)
+    .then(({ data }) =>
+      dispatch({
+        type: GET_USER,
+        data
+      })
+    )
     .catch(err => {
       dispatch({
         type: GET_ERRORS,

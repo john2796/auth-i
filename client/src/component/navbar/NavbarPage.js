@@ -35,7 +35,7 @@ class NavbarPage extends React.Component {
           <Collapse isOpen={this.state.isOpen} navbar>
             <Nav className="ml-auto" navbar>
               <NavItem>
-                <NavLink href="/components/">GG sir</NavLink>
+                <NavLink href="#">GG sir</NavLink>
               </NavItem>
               <NavItem>
                 <NavLink

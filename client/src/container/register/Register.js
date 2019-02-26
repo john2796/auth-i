@@ -8,7 +8,8 @@ import {
   Button,
   CardTitle,
   Row,
-  Col
+  Col,
+  Spinner
 } from "reactstrap";
 import { connect } from "react-redux";
 import { registerUser } from "../../store/action/authAction";
@@ -21,6 +22,12 @@ class Register extends React.Component {
       username: "",
       password: ""
     };
+  }
+
+  componentDidMount() {
+    if (this.props.isAuthenticated) {
+      this.props.history.push("/dashboard");
+    }
   }
 
   handleChange = e => {
@@ -48,6 +55,7 @@ class Register extends React.Component {
         <Col sm="6" md="5" style={{ margin: "10vh auto" }}>
           <Card body>
             <CardTitle>REGISTER</CardTitle>
+            {this.props.loading && <Spinner color="info" />}
             <Form onSubmit={this.handleSubmit}>
               <FormGroup>
                 <Input

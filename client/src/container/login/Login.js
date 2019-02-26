@@ -8,7 +8,8 @@ import {
   Button,
   CardTitle,
   Row,
-  Col
+  Col,
+  Spinner
 } from "reactstrap";
 import { connect } from "react-redux";
 import { loginUser } from "../../store/action/authAction";
@@ -46,13 +47,13 @@ class Login extends React.Component {
   };
 
   render() {
-    console.log(this.props.errors);
-
     return (
       <Row>
         <Col sm="6" md="5" style={{ margin: "10vh auto" }}>
           <Card body>
             <CardTitle>LOGIN</CardTitle>
+            {this.props.loading && <Spinner color="info" />}
+
             <Form onSubmit={this.handleSubmit}>
               <FormGroup>
                 <Input
