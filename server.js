@@ -76,11 +76,10 @@ server.post("/api/login", async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     //save user in cookies
     if (isMatch) {
-      req.session.user = user;
+      //req.session.user = user;
       const payload = {
         id: user.id,
-        username: user.username,
-        password: user.password
+        username: user.username
       };
 
       jwt.sign(
@@ -106,26 +105,30 @@ server.post("/api/login", async (req, res) => {
 // @desc      protected auth
 // @Access   Private
 function auth(req, res, next) {
-  console.log(req.session);
-  if (req.session && req.session.user) {
-    next();
-  } else {
-    res.status(401).json({ message: "You shall not pass boii" });
-  }
+  // if (req.session && req.session.user) {
+  //   next();
+  // } else {
+  //   res.status(401).json({ message: "You shall not pass boii" });
+  // }
 
   //using token
-  // if (token) {
-  //   jwt.verify(token, "secret", (error, decoded) => {
-  //     if (error) {
-  //       res.status(401).json({ message: "You are not authorized" });
-  //     } else {
-  //       req.decoded = decoded;
-  //       next();
-  //     }
-  //   });
-  // } else {
-  //   res.status(401).json({ message: "You are not authorized" });
-  // }
+  const token = req.headers["Authorization"];
+  try {
+    if (token) {
+      jwt.verify(token, keys, (error, decoded) => {
+        if (error) {
+          res.status(401).json({ message: "You are not authorized" });
+        } else {
+          req.decoded = decoded;
+          next();
+        }
+      });
+    } else {
+      res.status(401).json({ message: "You are not authorized" });
+    }
+  } catch (err) {
+    res.status(500).json({ message: err });
+  }
 }
 server.get("/api/users", auth, async (req, res) => {
   try {
