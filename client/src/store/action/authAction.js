@@ -6,6 +6,7 @@ export const GET_ERRORS = "GET_ERRORS";
 export const SET_CURRENT_USER = "SET_CURRENT_USER";
 export const LOADING = "LOADING";
 export const GET_USER = "GET_USER";
+export const REGISTER_USER = "REGISTER_USER";
 
 const URL = `http://localhost:5000/api`;
 const USERS = `http://localhost:5000/api/users`;
@@ -13,7 +14,11 @@ export const registerUser = (userData, history) => dispatch => {
   dispatch(setUserLoading());
   axios
     .post(`${URL}/register`, userData)
-    .then(res => console.log(res.data))
+    .then(res =>
+      dispatch({
+        type: REGISTER_USER
+      })
+    )
     .then(res => history.push("/login"))
     .catch(err => {
       dispatch({

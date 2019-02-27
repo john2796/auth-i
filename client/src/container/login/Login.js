@@ -23,7 +23,6 @@ class Login extends React.Component {
       password: ""
     };
   }
-
   componentWillReceiveProps(nextProps) {
     if (nextProps.isAuthenticated) {
       this.props.history.push("/dashboard");
