@@ -89,7 +89,7 @@ server.post("/api/login", async (req, res) => {
         (err, token) => {
           res.json({
             success: true,
-            token: token
+            token
           });
         }
       );
@@ -110,9 +110,8 @@ function auth(req, res, next) {
   // } else {
   //   res.status(401).json({ message: "You shall not pass boii" });
   // }
-
   //using token
-  const token = req.headers["Authorization"];
+  const token = req.headers["authorization"];
   try {
     if (token) {
       jwt.verify(token, keys, (error, decoded) => {
@@ -130,7 +129,9 @@ function auth(req, res, next) {
     res.status(500).json({ message: err });
   }
 }
+
 server.get("/api/users", auth, async (req, res) => {
+  console.log(req.decoded);
   try {
     const users = await User.find();
 
